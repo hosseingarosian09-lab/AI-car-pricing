@@ -40,3 +40,27 @@ for link in links :
       year = year if year else None
       color = color if color else None
 
+
+    # finding gearbox and fule type , and price 
+    info = soup.find_all(class_="kt-base-row kt-base-row--large kt-unexpandable-row")
+    try :
+        for item in info:
+            try:
+                if item.find(class_="kt-base-row__title kt-unexpandable-row__title").text == "گیربکس":
+                    gearbox = item.find(class_="kt-unexpandable-row__value").text
+            except:
+                gearbox = None
+            try:
+                if item.find(class_="kt-base-row__title kt-unexpandable-row__title").text == "نوع سوخت":
+                    fule = item.find(class_="kt-unexpandable-row__value").text
+            except:
+                fule = None
+            try:
+                if item.find(class_="kt-base-row__title kt-unexpandable-row__title").text == "قیمت پایه":
+                    price = item.find(class_="kt-unexpandable-row__value").text
+            except:
+                price = None
+    except Exception as e :
+        print(e)  
+
+
