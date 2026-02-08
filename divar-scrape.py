@@ -25,8 +25,9 @@ for link in links :
       titel_brand = soup.find(class_="kt-unexpandable-row__action kt-text-truncate").text
     except TypeError:
       titel_brand = soup.find(class_="kt-base-row__end kt-unexpandable-row__value-box").text
-    else : 
-      titel_brand = None
+    except:
+        titel_brand = None
+
 
     # finding kilometer,made year and color 
     try:
