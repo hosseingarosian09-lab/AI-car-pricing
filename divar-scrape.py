@@ -16,7 +16,11 @@ for card in cards:
 
 #finding each element in each page 
 for link in links :
-    request = requests.get(link,timeout=5)
+    request = requests.get(link,timeout=10)
+    if request.status_code != 200:
+            print(f"skiped for error: \n{request.status_code}")
+            continue
+    
     soup = BeautifulSoup(request.text , "html.parser")
 
     # initialize all per-link vars to avoid UnboundLocalError
@@ -32,24 +36,31 @@ for link in links :
     pictuer = None
 
     # finding titel and brand 
-    try:
-      titel_brand = soup.find(class_="kt-unexpandable-row__action kt-text-truncate").text
-    except TypeError:
-      titel_brand = soup.find(class_="kt-base-row__end kt-unexpandable-row__value-box").text
-    except:
-        titel_brand = None
+    titel_brand = soup.find('h1')
+    if titel_brand:
+        titel_brand = titel_brand.text.strip()
+    else:
+        try:
+            titel_brand = soup.find(class_="kt-unexpandable-row__action kt-text-truncate").text
+        except :
+            titel_brand = None
+        if titel_brand == None :
+            try: 
+                titel_brand = soup.find(class_="kt-base-row__end kt-unexpandable-row__value-box").text
+            except:
+                titel_brand = None
 
     # finding kilometer,made year and color 
     try:
-      info = soup.find_all(class_="kt-group-row-item kt-group-row-item__value kt-group-row-item--info-row")
-      if info :
-        kilometer = info[0].text
-        year = info[1].text
-        color = info[2].text
+        info = soup.find_all(class_="kt-group-row-item kt-group-row-item__value kt-group-row-item--info-row")
+        if info :
+            kilometer = info[0].text
+            year = info[1].text
+            color = info[2].text
     except:
-      kilometer = kilometer if kilometer else None
-      year = year if year else None
-      color = color if color else None
+        kilometer = kilometer if kilometer else None
+        year = year if year else None
+        color = color if color else None
 
     # finding gearbox and fule type , and price 
     info = soup.find_all(class_="kt-base-row kt-base-row--large kt-unexpandable-row")
