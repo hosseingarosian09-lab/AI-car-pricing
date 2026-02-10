@@ -93,3 +93,10 @@ headers = [
     "sec-ch-ua-platform": '"Windows"',
 },
 ]
+
+def get_random_headers(link):
+    template = random.choice(headers).copy()
+    if random.random() < 0.15:
+        template["Accept-Language"] = "en-US,en;q=0.9,fa-IR;q=0.8,fa;q=0.7"
+    template["Referer"] = link
+    return template
