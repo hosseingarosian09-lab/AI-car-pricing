@@ -4,7 +4,7 @@ from random_headers import get_random_headers
 from divar_scrape import extract_car_info
 
 #finding all links in the page
-request = requests.get("https://divar.ir/s/iran/auto")
+request = requests.get("https://divar.ir/s/iran/auto",timeout=10, headers=get_random_headers("https://divar.ir/s/iran/auto"))
 
 print(request.status_code)
 
@@ -15,28 +15,33 @@ links = []
 for card in cards:
     href = card.get('href')
     links.append('https://divar.ir' + href)
-
-for link in links :
-    # generating random headers
-    headers = get_random_headers(str(link))
-
-    request = requests.get(link,timeout=10, headers=headers)
-    if request.status_code != 200:
-            print(f"skiped for error: \n{request.status_code}")
-            continue
     
-    info_list = extract_car_info(request)
+headers = None
+for link in links :
 
-    print(
-         "titel_brand: ", info_list[0], "\n",
-         "kilometer: ", info_list[1], "\n",
-         "year: ", info_list[2], "\n",
-         "color: ", info_list[3], "\n",
-         "gearbox: ", info_list[4], "\n",
-         "fule: ", info_list[5], "\n",
-         "price: ", info_list[6], "\n",
-         "body_condition: ", info_list[7], "\n",
-         "discription: ", info_list[8], "\n",
-         "pictuer: ", info_list[9], "\n",
-         "-----------------------------"
-    )
+    #if haders is None than its not working and we need to get new headers for each request
+    if headers == None:
+        headers = get_random_headers(str(link))
+
+    request = requests.get(link,timeout=20, headers = headers)
+    info_list = extract_car_info(request)
+    
+    if info_list[0] != None:
+        #send jason
+        print(
+        "titel_brand: ", info_list[0], "\n",
+        "kilometer: ", info_list[1], "\n",
+        "year: ", info_list[2], "\n",
+        "color: ", info_list[3], "\n",
+        "gearbox: ", info_list[4], "\n",
+        "fule: ", info_list[5], "\n",
+        "price: ", info_list[6], "\n",
+        "body_condition: ", info_list[7], "\n",
+        "discription: ", info_list[8], "\n",
+        "pictuer: ", info_list[9], "\n",
+        "-----------------------------"
+        )
+    else:
+        headers = None
+    
+    
