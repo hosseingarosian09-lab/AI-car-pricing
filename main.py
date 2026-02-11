@@ -2,10 +2,20 @@ import requests
 from bs4 import BeautifulSoup
 from random_headers import get_random_headers, headers_len
 from divar_scrape import extract_car_info
-import random
+import random , time
+
+# a function to sleep for a random amount of time like a human
+def human_like_delay():
+    r = random.random()
+    if r < 0.65:
+        time.sleep(random.uniform(4.8, 7.5))
+    elif r < 0.90:
+        time.sleep(random.uniform(7.5, 13.0))
+    else:
+        time.sleep(random.uniform(13.0, 28.0))
 
 #finding all links in the page
-request = requests.get("https://divar.ir/s/iran/auto",timeout=random.randint(10,30), headers=get_random_headers("https://divar.ir/s/iran/auto"))
+request = requests.get("https://divar.ir/s/iran/auto",timeout=(5, 15), headers=get_random_headers("https://divar.ir/s/iran/auto"))
 
 print(request.status_code)
 
@@ -27,7 +37,8 @@ for link in links :
     while headers in false_headers:
         headers = get_random_headers(str(link))
 
-    request = requests.get(link,timeout=random.randint(10,30), headers = headers)
+    human_like_delay()
+    request = requests.get(link,timeout=(5, 15), headers = headers)
     info_list = extract_car_info(request)
     
     if info_list[0] != None:
