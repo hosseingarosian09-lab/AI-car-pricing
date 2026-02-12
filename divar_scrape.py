@@ -83,4 +83,17 @@ def extract_car_info(html):
         if pic_elem:
             pictuer = pic_elem.get('src')
     
-    return [titel_brand, kilometer, year, color, gearbox, fule, price, body_condition, discription, pictuer]
+    # returing all the info as Json
+        json_data = {
+        "title_brand": titel_brand,
+        "kilometer": kilometer,
+        "year": year,
+        "color": color,
+        "gearbox": gearbox,
+        "fule": fule,
+        "price": price,
+        "body_condition": body_condition,
+        "discription": discription,
+        "pictuer": pictuer
+        }
+        return json_data
