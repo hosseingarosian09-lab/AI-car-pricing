@@ -30,6 +30,16 @@ chrome_mirrors = [
     "https://cdn.npmmirror.com/binaries/chromedriver",
     "https://registry.npmmirror.com/-/binary/chrome-for-testing", 
 ]
+firefox_mirrors = [
+    "https://registry.npmmirror.com/-/binary/geckodriver",
+    "https://sourceforge.net/projects/geckodriver.mirror/files",
+]
+edge_mirrors = [
+    "https://registry.npmmirror.com/-/binary/edgedriver",
+    "https://npmmirror.com/mirrors/edgedriver",
+    "https://mirrors.huaweicloud.com/edgedriver",
+]
+
 
 driver = None
 if is_chrome_installed():
@@ -44,5 +54,26 @@ if is_chrome_installed():
             break 
         except Exception:
             continue  # Try the next mirror if this one fails
+elif is_firefox_installed():
+    for mirror_url in firefox_mirrors:
+        try:
+            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+            break
+        except Exception:
+            service = FirefoxService(GeckoDriverManager(url=mirror_url).install())
+            driver = webdriver.Firefox(service=service)
+            break
+        except Exception:
+            continue
+elif is_edge_installed():
+    for mirror_url in edge_mirrors:
+        try:
+            driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+            break
+        except Exception:
+            service = EdgeService(EdgeChromiumDriverManager(url=mirror_url).install())
+            driver = webdriver.Edge(service=service)
+            break
+        except Exception:
+            continue
 
-driver.get("https://www.google.com")
