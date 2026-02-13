@@ -6,6 +6,7 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+import time
 
 
 # wrote these functions with the help of AI, it checks if any of common browsers are installed
@@ -40,40 +41,63 @@ edge_mirrors = [
     "https://mirrors.huaweicloud.com/edgedriver",
 ]
 
+def setup_webdriver():
+    if is_chrome_installed():
+        for mirror_url in chrome_mirrors:
+            # install the driver via the default method first, if it fails, try the mirror urls
+            try:
+                driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+                break  # Stop on first success
+            except Exception:
+                service = ChromeService(ChromeDriverManager(url=mirror_url).install())
+                driver = webdriver.Chrome(service=service)
+                break 
+            except Exception:
+                continue  # Try the next mirror if this one fails
+    elif is_firefox_installed():
+        for mirror_url in firefox_mirrors:
+            try:
+                driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+                break
+            except Exception:
+                service = FirefoxService(GeckoDriverManager(url=mirror_url).install())
+                driver = webdriver.Firefox(service=service)
+                break
+            except Exception:
+                continue
+    elif is_edge_installed():
+        for mirror_url in edge_mirrors:
+            try:
+                driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+                break
+            except Exception:
+                service = EdgeService(EdgeChromiumDriverManager(url=mirror_url).install())
+                driver = webdriver.Edge(service=service)
+                break
+            except Exception:
+                continue
+    return driver
 
-driver = None
-if is_chrome_installed():
-    for mirror_url in chrome_mirrors:
-        # install the driver via the default method first, if it fails, try the mirror urls
-        try:
-            driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
-            break  # Stop on first success
-        except Exception:
-            service = ChromeService(ChromeDriverManager(url=mirror_url).install())
-            driver = webdriver.Chrome(service=service)
-            break 
-        except Exception:
-            continue  # Try the next mirror if this one fails
-elif is_firefox_installed():
-    for mirror_url in firefox_mirrors:
-        try:
-            driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
-            break
-        except Exception:
-            service = FirefoxService(GeckoDriverManager(url=mirror_url).install())
-            driver = webdriver.Firefox(service=service)
-            break
-        except Exception:
-            continue
-elif is_edge_installed():
-    for mirror_url in edge_mirrors:
-        try:
-            driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
-            break
-        except Exception:
-            service = EdgeService(EdgeChromiumDriverManager(url=mirror_url).install())
-            driver = webdriver.Edge(service=service)
-            break
-        except Exception:
-            continue
 
+def scrape_links_divar(url):
+    driver = setup_webdriver()
+    driver.get(url)
+
+    driver.execute_script("document.body.style.zoom='30%'")
+    time.sleep(2)
+    driver.fullscreen_window()
+    time.sleep(10)
+
+    links = []
+    try:
+        elements = driver.find_elements_by_class_name('kt-post-card__action')
+        for element in elements:
+            print(element)
+            href = element.get_attribute('href')
+            print(href)
+            links.append(href)
+    except:
+        pass
+    return links
+
+print(scrape_links_divar("https://divar.ir/s/iran/auto"))
