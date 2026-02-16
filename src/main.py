@@ -1,6 +1,6 @@
 import requests 
 from bs4 import BeautifulSoup
-from random_headers import get_random_headers, headers_len
+from random_headers import get_random_headers, get_headers_len
 from divar_scrape import extract_car_info
 import random , time
 
@@ -32,7 +32,7 @@ headers = None
 for link in links :
 
     # check if headers is in false_headers list and if the list is too long, clear it
-    if len(false_headers) > headers_len():
+    if len(false_headers) > get_headers_len():
         false_headers.clear()
     while headers in false_headers:
         headers = get_random_headers(str(link))
