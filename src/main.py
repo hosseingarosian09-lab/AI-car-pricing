@@ -1,7 +1,7 @@
 import requests 
-from bs4 import BeautifulSoup
 from random_headers import get_random_headers, get_headers_len
 from divar_scrape import extract_car_info
+from divar_link_scrape import scrape_links_divar
 import random , time
 
 # a function to sleep for a random amount of time like a human
@@ -15,20 +15,20 @@ def human_like_delay():
         time.sleep(random.uniform(13.0, 28.0))
 
 #finding all links in the page
-request = requests.get("https://divar.ir/s/iran/auto",timeout=(5, 15), headers=get_random_headers("https://divar.ir/s/iran/auto"))
+links = scrape_links_divar("https://divar.ir/s/iran/auto")
+# request = requests.get("https://divar.ir/s/iran/auto",timeout=(5, 15), headers=get_random_headers("https://divar.ir/s/iran/auto"))
+# print(request.status_code)
+# soup = BeautifulSoup(request.text , "html.parser")
+# cards = soup.find_all('a', class_='kt-post-card__action')
 
-print(request.status_code)
-
-soup = BeautifulSoup(request.text , "html.parser")
-cards = soup.find_all('a', class_='kt-post-card__action')
-
-links = []
-for card in cards:
-    href = card.get('href')
-    links.append('https://divar.ir' + href)
+# links = []
+# for card in cards:
+#     href = card.get('href')
+#     links.append('https://divar.ir' + href)
 
 false_headers = []
 headers = None
+len_data = 0
 for link in links :
 
     # check if headers is in false_headers list and if the list is too long, clear it
@@ -42,13 +42,18 @@ for link in links :
 
     #json data
     data = extract_car_info(request)
-    if data["title_brand"] != None:
-        # send data to database or save it to a file
-        pass
-    else:
-        false_headers.append(headers)
+    if data != None :
+        if data["title_brand"] != None:
+            # send data to database or save it to a file
+            pass
+        else:
+            false_headers.append(headers)
 
     print(data)
+    len_data +=1
+    print()
+
+print(len_data)
     
 
     
