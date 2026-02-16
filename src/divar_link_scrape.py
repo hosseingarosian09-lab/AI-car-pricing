@@ -1,5 +1,8 @@
 import shutil
 import time
+
+from random_headers import get_random_User_Agent
+
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
@@ -7,6 +10,9 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
 from selenium.webdriver.edge.service import Service as EdgeService
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.firefox.options import Options as FirefoxOptions
+from selenium.webdriver.edge.options import Options as EdgeOptions
 from selenium.webdriver.common.by import By
 
 
@@ -42,12 +48,45 @@ edge_mirrors = [
     "https://mirrors.huaweicloud.com/edgedriver",
 ]
 
+# args for driver options 
+chrome_args = [
+    "--headless=new",                        # Modern headless mode
+    "--window-size=1920,1080",               
+    "--no-sandbox",                          # Often required in containers/Linux
+    "--disable-dev-shm-usage",               # Memory stability in restricted envs
+    "--disable-gpu",                         
+    "--disable-software-rasterizer",
+    "--disable-blink-features=AutomationControlled",  # Reduce basic bot detection
+    f"ususer-agent={get_random_User_Agent()}",
+]
+firefox_args = [
+    "--headless",             
+    "--width=1920",
+    "--height=1080",          
+]
+edge_args = [
+    "--headless=new",                        
+    "--window-size=1920,1080",
+    "--no-sandbox",
+    "--disable-dev-shm-usage",
+    "--disable-gpu",
+    "--disable-software-rasterizer",
+    "--disable-blink-features=AutomationControlled",
+    f"user-agent={get_random_User_Agent()}",
+]
+
+
 def setup_webdriver():
     if is_chrome_installed():
+        #add options :
+        options = ChromeOptions()
+        for arg in chrome_args:
+            options.add_argument(arg)
+        
         for mirror_url in chrome_mirrors:
             # install the driver via the default method first, if it fails, try the mirror urls
             try:
-                driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+                driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()), options=options)
                 break  # Stop on first success
             except Exception:
                 service = ChromeService(ChromeDriverManager(url=mirror_url).install())
@@ -55,30 +94,39 @@ def setup_webdriver():
                 break 
             except Exception:
                 continue  # Try the next mirror if this one fails
+    
     elif is_firefox_installed():
+        options = FirefoxOptions()
+        for arg in chrome_args:
+            options.add_argument(arg)
+    
         for mirror_url in firefox_mirrors:
             try:
-                driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+                driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=options)
                 break
             except Exception:
                 service = FirefoxService(GeckoDriverManager(url=mirror_url).install())
-                driver = webdriver.Firefox(service=service)
+                driver = webdriver.Firefox(service=service, options=options)
                 break
             except Exception:
                 continue
+
     elif is_edge_installed():
+        options = EdgeOptions()
+        for arg in chrome_args:
+            options.add_argument(arg)
+
         for mirror_url in edge_mirrors:
             try:
-                driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+                driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()), options=options)
                 break
             except Exception:
                 service = EdgeService(EdgeChromiumDriverManager(url=mirror_url).install())
-                driver = webdriver.Edge(service=service)
+                driver = webdriver.Edge(service=service, options=options)
                 break
             except Exception:
                 continue
     return driver
-
 
 def scrape_links_divar(url):
     driver = setup_webdriver()
