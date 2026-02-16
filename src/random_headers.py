@@ -115,5 +115,5 @@ for header in headers:
     User_Agents.append(header["User-Agent"])
 
 def get_random_User_Agent():
-    User_Agent = random.choice(User_Agents).copy()
-    return User_Agents
+    User_Agent = random.choice(User_Agents)
+    return User_Agent
