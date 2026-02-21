@@ -150,3 +150,8 @@ def scrape_links_divar(url):
         pass
     driver.quit()
     return links
+
+if __name__ == "__main__":
+    test_links = scrape_links_divar("https://divar.ir/s/iran/auto")
+    print(f"Total links scraped: {len(test_links)}")
+    # send it to data base
