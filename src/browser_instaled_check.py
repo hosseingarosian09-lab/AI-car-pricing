@@ -58,9 +58,3 @@ def is_edge_installed() -> bool:
         "/Applications/Microsoft Edge.app",
     ]
     return _check_browser(names, win_paths, mac_paths)
-
-
-# Test
-print("Chrome installed:", is_chrome_installed())
-print("Firefox installed:", is_firefox_installed())
-print("Edge installed:", is_edge_installed())

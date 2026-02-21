@@ -14,24 +14,14 @@ def human_like_delay():
     else:
         time.sleep(random.uniform(13.0, 28.0))
 
-#finding all links in the page
+# i should add progres bar
 links = scrape_links_divar("https://divar.ir/s/iran/auto")
-# request = requests.get("https://divar.ir/s/iran/auto",timeout=(5, 15), headers=get_random_headers("https://divar.ir/s/iran/auto"))
-# print(request.status_code)
-# soup = BeautifulSoup(request.text , "html.parser")
-# cards = soup.find_all('a', class_='kt-post-card__action')
-
-# links = []
-# for card in cards:
-#     href = card.get('href')
-#     links.append('https://divar.ir' + href)
 
 false_headers = []
 headers = None
 len_data = 0
 for link in links :
-
-    # check if headers is in false_headers list and if the list is too long, clear it
+    # check if headers is in false_headers list and if the list is full long, clear it
     if len(false_headers) > get_headers_len():
         false_headers.clear()
     while headers in false_headers:
@@ -40,7 +30,6 @@ for link in links :
     human_like_delay()
     request = requests.get(link,timeout=(5, 15), headers = headers)
 
-    #json data
     data = extract_car_info(request)
     if data != None :
         if data["title_brand"] != None:
@@ -48,7 +37,6 @@ for link in links :
             pass
         else:
             false_headers.append(headers)
-
     print(data)
     len_data +=1
     print()

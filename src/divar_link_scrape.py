@@ -117,6 +117,7 @@ def scrape_links_divar(url):
         browser = "firefox"
     elif is_edge_installed :
         browser = "edge"
+    else : browser = "chrome"
     
     driver = setup_webdriver(browser)
     driver.get(url)
